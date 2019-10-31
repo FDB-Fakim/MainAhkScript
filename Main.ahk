@@ -23,6 +23,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;;;		 - Active window maps are found under the "windowName" section
 ;;;		 - Shift + Ctrl + Alt + Insert = will Reload script
 ;;;      - Shift + Ctrl + Alt + End = will exit script
+;;;      - Add shortcut to script in %appdata%\Microsoft\Windows\Start Menu\Programs\Startup
+;;;
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -35,7 +37,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;;                                           
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-vkC0 & F13:: CapsLock
+~F13 & vkC0:: CapsLock
 
 +^!Insert:: Reload
 +^!End:: ExitApp
@@ -49,15 +51,49 @@ vkC0 & F13:: CapsLock
 
 #IfWinActive, Blender 
 	F13:: 
-		Send {LCtrl down}{LShift down}{LAlt down}{vkBA down} ;vkBA = ;
+		gosub, SendSemiColon
 		KeyWait F13
-		Send {LCtrl up}{LShift up}{LAlt up}{vkBA up} 
+		If GetKeyState("LButton","P" ){
+			return
+		} else {
+			gosub, ReleaseSemiColon
+		}
+		
 	return
 	
 	F14:: 	
-		Send {LCtrl down}{LShift down}{LAlt down}{vkC0 down} ;vkC0 = ` (~ key)
+		gosub, SendTildeKey
 		KeyWait F14
-		Send {LCtrl up}{LShift up}{LAlt up}{vkC0 up} 
+		If GetKeyState("LButton","P" ){
+			return
+		} else {
+			gosub, ReleaseTildeKey
+		}
+	return
+	
+	~F13 & LButton:: 
+		KeyWait LButton
+		gosub, ReleaseSemiColon
+	return
+	
+	~F14 & LButton:: 
+		KeyWait LButton
+		gosub, ReleaseTildeKey
+	return
+		
+	
+	SendSemiColon: 
+	Send {LCtrl down}{LShift down}{LAlt down}{vkBA down} ;vkBA = ;
+	return
+	ReleaseSemiColon: 
+	Send {LCtrl up}{LShift up}{LAlt up}{vkBA up} 
+	return
+	
+	SendTildeKey: 
+	Send {LCtrl down}{LShift down}{LAlt down}{vkC0 down} ;vkC0 = ` (~ key)
+	return
+	ReleaseTildeKey: 
+	Send {LCtrl up}{LShift up}{LAlt up}{vkC0 up}
 	return
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
